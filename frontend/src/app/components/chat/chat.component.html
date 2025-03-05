@@ -1,0 +1,14 @@
+<!-- frontend/src/app/components/chat/chat.component.html -->
+<div class="chat-container">
+  <div class="messages">
+    <div *ngFor="let message of messages" class="message">
+      <div [ngClass]="message.type === 'AI' ? 'message ai' : 'message human'">
+        {{message.content}}
+      </div>
+    </div>
+  </div>
+  <div class="input-container">
+    <input [disabled]="inputDisabled==true" [(ngModel)]="newMessage.content" placeholder="Type a message..." (keydown.enter)="sendMessage()" />
+    <button [disabled]="inputDisabled==true" (click)="sendMessage()">Send</button>
+  </div>
+</div>

@@ -7,7 +7,7 @@ tutorial_questions = [
     "My name is Eduardo Fernandez.",
     "My phone number is 555-555-5555.",
     "I would like to book an appointment for Next Monday at 2PM.",
-    "Can you please list all my feature appointments?",
+    "Can you please list all my future appointments?",
     # "Sure, my name is Eduardo Fernandez and my phone number is 555-555-5555.",
 ]
 

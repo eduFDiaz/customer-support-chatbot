@@ -1,5 +1,5 @@
 # python gitignore, ignore env, pycache, and pyc files
 *.pyc
-.gradio/
-__pycache__/
+.gradio
+./server/__pycache__
 env/
