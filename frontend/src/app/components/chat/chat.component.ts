@@ -2,49 +2,57 @@ import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { MarkdownModule } from "../../shared/markdown/markdown.module"; // Import HttpClientModule
 
 interface Message {
   type: string | 'AI' | 'HUMAN';
-  content: string;
+  message: string;
 }
-
-const EMPTY_MESSAGE = { type: 'HUMAN', content: '' };
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
-  imports: [CommonModule, FormsModule], // Add HttpClientModule here
+  imports: [CommonModule, FormsModule, HttpClientModule, MarkdownModule], // Add HttpClientModule here
 })
 export class ChatComponent implements OnInit {
-  messages: Message[] = [
-    // { type: 'AI', content: 'Hello! How  it going?' },
-    // { type: 'HUMAN', content: 'How can I help you today?' },
-    // { type: 'AI', content: 'What can I do for you?' },
-  ];
-  newMessage: Message = { ...EMPTY_MESSAGE };
-  inputDisabled:Boolean = false;
+  messages: Message[] = [];
+  newMessage: string = '';
+  interruptMessage: any = null;
+  interruptResponse: string = ''; // Add this variable
 
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
     this.loadMessages();
+    this.handleInterrupts();
   }
 
   loadMessages(): void {
-    this.chatService.messagesSubject.subscribe((data: any) => {
-      this.messages.push({ type: 'AI', content: data });
-      this.inputDisabled = false;
+    this.chatService.getMessages().subscribe((data: any) => {
+      this.messages.push({ type: 'AI', message: data });
+    });
+  }
+
+  handleInterrupts(): void {
+    this.chatService.getInterrupts().subscribe((data: any) => {
+      this.interruptMessage = data;
     });
   }
 
   sendMessage(): void {
-    if (this.newMessage.content.trim()) {
-      this.messages.push({ type: 'HUMAN', content: this.newMessage.content });
-      this.chatService.sendMessage(this.newMessage.content);
-      this.newMessage = { ...EMPTY_MESSAGE };
-      this.inputDisabled = true;
+    if (this.newMessage.trim()) {
+      this.messages.push({ type: 'HUMAN', message: this.newMessage });
+      this.chatService.sendMessage(this.newMessage);
+      this.newMessage = '';
     }
+  }
+
+  sendInterruptResponse(response: string): void {
+    this.chatService.sendInterruptResponse(response);
+    this.interruptMessage = null;
+    this.interruptResponse = ''; // Reset the interruptResponse
   }
 }

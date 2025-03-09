@@ -1,14 +1,38 @@
-<!-- frontend/src/app/components/chat/chat.component.html -->
 <div class="chat-container">
-  <div class="messages">
-    <div *ngFor="let message of messages" class="message">
-      <div [ngClass]="message.type === 'AI' ? 'message ai' : 'message human'">
-        {{message.content}}
+  <div class="messages-container">
+    <div class="messages-wrapper">
+      <div *ngFor="let message of messages" class="message-row">
+        <div class="avatar" [ngClass]="{'ai-avatar': message.type === 'AI', 'user-avatar': message.type !== 'AI'}">
+          {{message.type === 'AI' ? 'AI' : 'You'}}
+        </div>
+        <div class="message-bubble" [ngClass]="{'ai-message': message.type === 'AI', 'user-message': message.type !== 'AI'}">
+          <div *ngIf="message.type === 'AI'" [innerHTML]="message.message | markdown"></div>
+          <div *ngIf="message.type !== 'AI'">{{message.message}}</div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="input-container">
-    <input [disabled]="inputDisabled==true" [(ngModel)]="newMessage.content" placeholder="Type a message..." (keydown.enter)="sendMessage()" />
-    <button [disabled]="inputDisabled==true" (click)="sendMessage()">Send</button>
+  
+  <div class="input-container" *ngIf="!interruptMessage">
+    <input 
+      [(ngModel)]="newMessage" 
+      placeholder="Type a message..." 
+      class="message-input" 
+      (keydown.enter)="sendMessage()"
+    />
+    <button class="send-button" (click)="sendMessage()">
+      <span>Send</span>
+    </button>
+  </div>
+  
+  <div class="interrupt-container" *ngIf="interruptMessage">
+    <div class="interrupt-message">
+      <p>{{ interruptMessage.content }}</p>
+    </div>
+    <div class="interrupt-actions">
+      <button class="approve-button" (click)="sendInterruptResponse('y')">Approve</button>
+      <input [(ngModel)]="interruptResponse" class="explain-input" placeholder="Explain your changes..." />
+      <button class="deny-button" (click)="sendInterruptResponse(interruptResponse)">Deny</button>
+    </div>
   </div>
 </div>
