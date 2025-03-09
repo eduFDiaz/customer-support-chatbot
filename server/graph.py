@@ -140,7 +140,7 @@ def list_appointments(
             - appointment_date (date): Date of the appointment
        
        Returns:
-            - str: A message listing the appointments or an error message
+            - str: A message listing all the appointments for the patient
     """
     print(f"tool list_appointments called with {full_name}")
     return { "appointments" : [

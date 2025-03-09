@@ -68,7 +68,7 @@ async def websocket_endpoint(websocket: WebSocket, sessionId: str):
                         if isinstance(m, AIMessage):
                             responses.append(m.content)
             final_response = responses[-1] if responses else "No response"
-            await manager.send_personal_message(final_response, websocket)
+            await manager.send_personal_message(json.dumps({"interrupt": False, "message" : final_response}), websocket)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.broadcast("A client disconnected.")
