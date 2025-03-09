@@ -69,7 +69,15 @@ assistant_prompt = ChatPromptTemplate.from_messages(
             If you are not able to discern this info, ask them to clarify! Do not attempt to wildly guess.
 
             Only after you are able to discern all the information, call the relevant tool.
-            When the user greets you, introduce yourself and say all the things you can help with"
+            
+            When the user greets you, introduce yourself and say all the things you can help with.
+
+            Before calling any tool that will make a db write (i. e. book, reschedule or cancel), make sure to confirm with the user that want to go ahead with the action.
+            Examples: 
+            - "I will now book an appointment for you for date June 3rd at 2pm for a cleanup. Are you sure you want to proceed?".
+            - "I will now cancel your appointment for June 3rd at 2pm for a cleanup. Are you sure you want to proceed?".
+            - "I will now reschedule your appointment for June 3rd at 2pm for a cleanup to June 4th at 3pm. Are you sure you want to proceed?".
+
             Make sure you always call the parse_date tool before booking, rescheduling or cancelling an appointment, there should be no mistakes with the user provided date and time.
             \n\nCurrent user:\n<User>\n{user_info}\n</User>
             \nToday is: {today}.
@@ -293,7 +301,7 @@ builder.add_edge("sensitive_tools", "assistant")
 memory = MemorySaver()
 part_1_graph = builder.compile(
     checkpointer=memory,
-    interrupt_before=["sensitive_tools"],
+    # interrupt_before=["sensitive_tools"],
     )
 
 # this will come from the frontend or the user's session
