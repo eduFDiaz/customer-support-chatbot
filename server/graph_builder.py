@@ -1,16 +1,8 @@
-from datetime import datetime
-from typing import Annotated, Literal, Optional
-
-from langchain_core.messages import BaseMessage, AnyMessage, SystemMessage, HumanMessage, ToolMessage
-from langchain_core.runnables import Runnable, RunnableLambda, RunnableConfig
-
+from langchain_core.runnables import RunnableLambda
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode, tools_condition
 
-import uuid
-
-# Import from our modular structure
 from state import State
 from tools import fetch_user_information, handle_tool_error
 from assistant import create_assistant
@@ -19,16 +11,8 @@ def build_graph():
     assistant, assistant_runnable, safe_tools, sensitive_tools = create_assistant()
     sensitive_tools_names = [tool.name for tool in sensitive_tools]
 
-    def chatbot(state: State):
-        message = assistant_runnable.invoke(state["messages"])
-        # Because we will be interrupting during tool execution,
-        # we disable parallel tool calling to avoid repeating any
-        # tool invocations when we resume.
-        assert len(message.tool_calls) <= 1
-        return {"messages": [message]}
-
     def user_info(state: State):
-        return {"user_info": fetch_user_information.invoke({})}
+        return {"user_info": fetch_user_information({})}
 
     def route_tools(state: State):
         next_node = tools_condition(state)
@@ -62,7 +46,6 @@ def build_graph():
     builder.add_edge("sensitive_tools", "assistant")
 
     # The checkpointer lets the graph persist its state
-    # this is a complete memory for the entire graph.
     memory = MemorySaver()
     graph = builder.compile(
         checkpointer=memory,
@@ -71,7 +54,7 @@ def build_graph():
 
     return graph, memory
 
-def print_event(event: dict, _printed: set, max_length=1500):
+def _print_event(event: dict, _printed: set, max_length=1500):
     current_state = event.get("dialog_state")
     if current_state:
         print("Currently in: ", current_state[-1])
@@ -85,19 +68,3 @@ def print_event(event: dict, _printed: set, max_length=1500):
                 msg_repr = msg_repr[:max_length] + " ... (truncated)"
             print(msg_repr)
             _printed.add(message.id)
-
-
-part_1_graph, memory = build_graph()
-    
-# this will come from the frontend or the user's session
-thread_id = str(uuid.uuid4())
-
-config = {
-        "configurable": {
-            # The user_id is used in our tools to
-            # fetch the user's information from the Database
-            "user_id": "3442 587242",
-            # Checkpoints are accessed by thread_id
-            "thread_id": thread_id,
-        }
-}

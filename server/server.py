@@ -3,9 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import json
 
-from graph import part_1_graph, config
-from langchain.schema import AIMessage, HumanMessage
-from langchain_core.messages import ToolMessage
+from graph import part_1_graph
+from langchain.schema import AIMessage
 
 # uvicorn server:app --host 0.0.0.0 --port 8000 --reload
 
