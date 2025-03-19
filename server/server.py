@@ -43,20 +43,32 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.websocket("/ws/{sessionId}")
-async def websocket_endpoint(websocket: WebSocket, sessionId: str):
+@app.websocket("/ws/{sessionId}/userId/{userId}/username/{userName}/email/{email}")
+async def websocket_endpoint(websocket: WebSocket, sessionId: str, userId: str, userName: str, email: str):
     await manager.connect(websocket)
-    try:
-        while True:
-            user_message = await websocket.receive_text()
-            # Create or update the config object using the sessionId
-            thread_id = sessionId
-            config = {
+    config = {
                 "configurable": {
-                    "user_id": "3442 587242",
-                    "thread_id": thread_id,
+                    "thread_id": sessionId,
+                    "user_id": userId,
+                    "full_name": userName,
+                    "email": email,
                 }
             }
+    print(f"Connected: {config}")
+    # Send the initial message to the client
+    await manager.send_personal_message(json.dumps({"interrupt": False, "message" : ""
+    f'''Welcome {userName}! 
+        
+        I'm the dentist clinic customer support assistant. 
+        
+        I can help you with booking, listing, rescheduling, or canceling your dentist appointments. 
+        
+        How can I assist you today?`
+    '''}), websocket)
+    
+    try:
+        while True:
+            user_message = await websocket.receive_text()          
 
             # Process the message using part_1_graph
             events = part_1_graph.stream({"messages": ("user", user_message)}, config, stream_mode="values")

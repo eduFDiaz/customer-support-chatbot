@@ -2,6 +2,7 @@ from langchain_core.runnables import RunnableLambda
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode, tools_condition
+from langchain_core.runnables import RunnableConfig
 
 from state import State
 from tools import fetch_user_information, handle_tool_error
@@ -11,8 +12,9 @@ def build_graph():
     assistant, assistant_runnable, safe_tools, sensitive_tools = create_assistant()
     sensitive_tools_names = [tool.name for tool in sensitive_tools]
 
-    def user_info(state: State):
-        return {"user_info": fetch_user_information({})}
+    def user_info(state: State, config: RunnableConfig):
+        print(f"Fetching user info with config: {config}")
+        return {"user_info": fetch_user_information.invoke(config)}
 
     def route_tools(state: State):
         next_node = tools_condition(state)

@@ -4,8 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MarkdownModule } from "../../shared/markdown/markdown.module"; // Import HttpClientModule
+import { AuthService } from '../../services/auth.service';
+import { UserProfile } from '../../services/auth.service';
 
-interface Message {
+export interface Message {
   type: string | 'AI' | 'HUMAN';
   message: string;
 }
@@ -22,12 +24,21 @@ export class ChatComponent implements OnInit {
   newMessage: string = '';
   interruptMessage: any = null;
   interruptResponse: string = ''; // Add this variable
+  user: UserProfile | null = null;
 
-  constructor(private chatService: ChatService) {}
+  constructor(private chatService: ChatService, private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.loadUser();
     this.loadMessages();
     this.handleInterrupts();
+  }
+
+  loadUser(): void {
+    this.user = this.authService.getCurrentUser();
+    if (this.user !== null) {
+      this.chatService.initializeWebSocket(this.user);
+    } 
   }
 
   loadMessages(): void {

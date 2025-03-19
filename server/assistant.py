@@ -12,7 +12,10 @@ class Assistant:
         while True:
             configuration = config.get("configurable", {})
             user_id = configuration.get("user_id", None)
-            state = {**state, "user_info": user_id}
+            full_name = configuration.get("full_name", None)
+            email = configuration.get("email", None)
+            state = {**state, "user_id": user_id, "full_name": full_name, "email": email}
+            print(f"Assistant called with state: {state}")
             result = self.runnable.invoke(state)
             # If the LLM happens to return an empty response, we will re-prompt it
             # for an actual response.

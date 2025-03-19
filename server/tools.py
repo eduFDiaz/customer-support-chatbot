@@ -83,18 +83,28 @@ def fetch_user_information(config: RunnableConfig = None) -> list[dict]:
     '''
     Tool to fetch user information from the database.
     '''
-    user_id = "default_user"
+    print(f"tool fetch_user_information called with {config}")
     if config and isinstance(config, dict):
-        configuration = config.get("configurable", {})
-        user_id = configuration.get("user_id", user_id)
-
-    user_info = [
-        { "user_id": user_id,
-          "full_name": "Eduardo Fernandez",
-          "phone_number": "555-555-5555" 
-        }
-    ]
-    return user_info
+        # Extract from configurable if it exists
+        if "configurable" in config:
+            configuration = config.get("configurable", {})
+            user_info = [
+                { 
+                "user_id": configuration.get("user_id"),
+                "full_name": configuration.get("username"),
+                "email": configuration.get("email"),
+                "phone_number": None,
+                "appointment_purpose": None,
+                "appointment_date": None,
+                "reschedule_date": None,
+                }
+            ]
+            print(f"Extracted user info: {user_info}")
+            return user_info
+    
+    # Return default empty user info if config is invalid
+    print("No valid config provided, returning empty user info")
+    return [{"user_id": None, "full_name": None, "email": None}]
 
 def handle_tool_error(state) -> dict:
     error = state.get("error")

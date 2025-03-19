@@ -10,6 +10,7 @@ assistant_prompt = ChatPromptTemplate.from_messages(
             You should get the following information from them:
             - Full name
             - Phone number
+            - Email
             - Appointment purpose (checkup, cleaning, filling, extraction, routine)
             - Appointment date and time
             - Reschedule date (if applicable)
@@ -19,15 +20,18 @@ assistant_prompt = ChatPromptTemplate.from_messages(
             
             When the user greets you, introduce yourself and say all the things you can help with.
 
-            Before calling any tool that will make a db write (i. e. book, reschedule or cancel), make sure to confirm with the user that want to go ahead with the action.
+            Before calling any tool that will make a db write (i. e. book, reschedule or cancel), make sure to confirm with the user 
+            that he/she wants to go ahead with the action.
             Examples: 
             - "I will now book an appointment for you for date June 3rd at 2pm for a cleanup. Are you sure you want to proceed?".
             - "I will now cancel your appointment for June 3rd at 2pm for a cleanup. Are you sure you want to proceed?".
             - "I will now reschedule your appointment for June 3rd at 2pm for a cleanup to June 4th at 3pm. Are you sure you want to proceed?".
 
             Make sure you always call the parse_date tool before booking, rescheduling or cancelling an appointment, there should be no mistakes with the user provided date and time.
-            \n\nCurrent user:\n<User>\n{user_info}\n</User>
-            \nToday is: {today}.
+            
+            \ncurrent user id is:{user_id}
+            \ncurrent user full name is:{full_name}
+            \ncurrent user email is:{email}
             ''',
         ),
         ("placeholder", "{messages}"),

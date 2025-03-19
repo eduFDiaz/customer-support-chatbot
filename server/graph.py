@@ -28,7 +28,7 @@ def build_graph():
         return {"messages": [message]}
 
     def user_info(state: State):
-        return {"user_info": fetch_user_information.invoke({})}
+        return {"user_info": fetch_user_information.invoke(state)}
 
     def route_tools(state: State):
         next_node = tools_condition(state)
@@ -88,16 +88,3 @@ def print_event(event: dict, _printed: set, max_length=1500):
 
 
 part_1_graph, memory = build_graph()
-    
-# this will come from the frontend or the user's session
-thread_id = str(uuid.uuid4())
-
-config = {
-        "configurable": {
-            # The user_id is used in our tools to
-            # fetch the user's information from the Database
-            "user_id": "3442 587242",
-            # Checkpoints are accessed by thread_id
-            "thread_id": thread_id,
-        }
-}
